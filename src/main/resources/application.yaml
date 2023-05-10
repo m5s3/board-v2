@@ -23,9 +23,6 @@ spring:
         default_batch_fetch_size: 100
     hibernate:
       ddl-auto: update
-  h2:
-    console:
-      enabled: false
   sql.init.mode: always
 
 
