@@ -4,7 +4,8 @@ import com.example.boardv2.domain.Article;
 import com.example.boardv2.domain.QArticle;
 import com.querydsl.core.types.dsl.DateTimeExpression;
 import com.querydsl.core.types.dsl.StringExpression;
-import org.hibernate.loader.plan.exec.query.spi.QueryBuildingParameters;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.querydsl.QuerydslPredicateExecutor;
 import org.springframework.data.querydsl.binding.QuerydslBinderCustomizer;
@@ -17,6 +18,12 @@ public interface ArticleRepository extends
         QuerydslPredicateExecutor<Article>, // 모든 필드에 기본 검색 기능을 추가해줌
         QuerydslBinderCustomizer<QArticle> // 검색 기능 커스텀마이징
 {
+
+    Page<Article> findByTitleContaining(String title, Pageable pageable);
+    Page<Article> findByContentContaining(String content, Pageable pageable);
+    Page<Article> findByUserAccount_UserIdContaining(String userId, Pageable pageable);
+    Page<Article> findByUserAccount_NicknameContaining(String nickname, Pageable pageable);
+    Page<Article> findByHashtag(String hashtag, Pageable pageable);
     @Override
     default void customize(QuerydslBindings bindings, QArticle root) {
         bindings.excludeUnlistedProperties(true);
