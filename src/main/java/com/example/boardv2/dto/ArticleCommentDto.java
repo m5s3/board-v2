@@ -31,7 +31,6 @@ public record ArticleCommentDto(
                 entity.getModifiedBy()
         );
     }
-
     public ArticleComment toEntity(Article entity) {
         return ArticleComment.of(
                 entity,
