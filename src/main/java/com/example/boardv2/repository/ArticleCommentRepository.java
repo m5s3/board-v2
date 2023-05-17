@@ -2,6 +2,7 @@ package com.example.boardv2.repository;
 
 import com.example.boardv2.domain.ArticleComment;
 import com.example.boardv2.domain.QArticleComment;
+import com.example.boardv2.dto.ArticleCommentDto;
 import com.querydsl.core.types.dsl.DateTimeExpression;
 import com.querydsl.core.types.dsl.StringExpression;
 import org.springframework.data.jpa.repository.JpaRepository;
@@ -9,6 +10,8 @@ import org.springframework.data.querydsl.QuerydslPredicateExecutor;
 import org.springframework.data.querydsl.binding.QuerydslBinderCustomizer;
 import org.springframework.data.querydsl.binding.QuerydslBindings;
 import org.springframework.data.rest.core.annotation.RepositoryRestResource;
+
+import java.util.List;
 
 @RepositoryRestResource
 public interface ArticleCommentRepository extends
@@ -24,4 +27,6 @@ public interface ArticleCommentRepository extends
         bindings.bind(root.createdAt).first(DateTimeExpression::eq);
         bindings.bind(root.createdBy).first(StringExpression::containsIgnoreCase);
     }
+
+    List<ArticleComment> findByArticle_Id(Long articleId);
 }
