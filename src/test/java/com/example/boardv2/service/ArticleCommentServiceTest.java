@@ -40,7 +40,7 @@ class ArticleCommentServiceTest {
                 Article.of(userAccount, "title", "content", "#java")
                 ));
         // When
-        List<ArticleCommentDto> articleComments = sut.searchArticleComment(articleId);
+        List<ArticleCommentDto> articleComments = sut.searchArticleComments(articleId);
 
         // Then
         assertThat(articleComments).isNotNull();
