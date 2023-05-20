@@ -1,7 +1,7 @@
 package com.example.boardv2.controller;
 
 import com.example.boardv2.config.SecurityConfig;
-import com.example.boardv2.domain.type.SearchType;
+import com.example.boardv2.domain.constant.SearchType;
 import com.example.boardv2.dto.ArticleWithCommentsDto;
 import com.example.boardv2.dto.UserAccountDto;
 import com.example.boardv2.service.ArticleService;
@@ -19,13 +19,11 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
-import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
 
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Set;
 
-import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.*;
 import static org.mockito.BDDMockito.given;
 import static org.mockito.BDDMockito.then;
@@ -123,7 +121,7 @@ class ArticleControllerTest {
     public void givenNothing_whenRequestArticleView_thenReturnsArticleView() throws Exception {
         // Given
         Long articleId = 1L;
-        given(articleService.getArticle(articleId)).willReturn(createArticleWithCommentsDto());
+        given(articleService.getArticleWithComments(articleId)).willReturn(createArticleWithCommentsDto());
         // When & Then
         mvc.perform(get("/articles/" + articleId))
                 .andExpect(status().isOk())
@@ -132,7 +130,7 @@ class ArticleControllerTest {
                 .andExpect(model().attributeExists("article"))
                 .andExpect(model().attributeExists("articleComments"));
 
-        then(articleService).should().getArticle(articleId);
+        then(articleService).should().getArticleWithComments(articleId);
     }
 
     @Disabled("구현 중")
@@ -212,7 +210,7 @@ class ArticleControllerTest {
     }
 
     private UserAccountDto createUserAccountDto() {
-        return UserAccountDto.of(1L,
+        return UserAccountDto.of(
                 "uno",
                 "pw",
                 "uno@mail.com",

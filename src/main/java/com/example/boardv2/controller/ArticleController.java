@@ -1,6 +1,9 @@
 package com.example.boardv2.controller;
 
-import com.example.boardv2.domain.type.SearchType;
+import com.example.boardv2.domain.constant.FormStatus;
+import com.example.boardv2.domain.constant.SearchType;
+import com.example.boardv2.dto.UserAccountDto;
+import com.example.boardv2.request.ArticleRequest;
 import com.example.boardv2.response.ArticleResponse;
 import com.example.boardv2.response.ArticleWithCommentsResponse;
 import com.example.boardv2.service.ArticleService;
@@ -12,10 +15,7 @@ import org.springframework.data.domain.Sort;
 import org.springframework.data.web.PageableDefault;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.ModelMap;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
@@ -45,7 +45,7 @@ public class ArticleController {
 
     @GetMapping("/{articleId}")
     public String article(@PathVariable Long articleId, ModelMap map) {
-        ArticleWithCommentsResponse articleWithCommentsResponse = ArticleWithCommentsResponse.from(articleService.getArticle(articleId));
+        ArticleWithCommentsResponse articleWithCommentsResponse = ArticleWithCommentsResponse.from(articleService.getArticleWithComments(articleId));
         map.addAttribute("article",  articleWithCommentsResponse);
         map.addAttribute("articleComments", articleWithCommentsResponse.articleCommentsResponse());
         //map.addAttribute("article", )
@@ -53,7 +53,7 @@ public class ArticleController {
     }
 
     @GetMapping("/search-hashtag")
-    public String searchHashtag(
+    public String searchArticleHashtag(
             @RequestParam(required = false) String searchValue,
             @PageableDefault(size = 10, sort = "createdAt", direction = Sort.Direction.DESC) Pageable page,
             ModelMap map
@@ -67,5 +67,46 @@ public class ArticleController {
         map.addAttribute("paginationBarNumbers", barNumbers);
         map.addAttribute("searchType", SearchType.HASHTAG);
         return "articles/search-hashtag";
+    }
+
+    @GetMapping("/form")
+    public String articleForm(ModelMap map) {
+        map.addAttribute("formStatus", FormStatus.CREATE);
+        return "articles/form";
+    }
+
+    @PostMapping("/form")
+    public String postNewArticle(ArticleRequest articleRequest) {
+        articleService.saveArticle(articleRequest.toDto(UserAccountDto.of(
+            "uno", "asdf1234", "uno@mail.com", "Uno", "memo"
+        )));
+
+        return "redirect:/articles";
+    }
+
+    @GetMapping("/{articleId}/form")
+    public String updateArticleForm(@PathVariable Long articleId, ModelMap map) {
+        ArticleResponse article = ArticleResponse.from(articleService.getArticle(articleId));
+
+        map.addAttribute("article", article);
+        map.addAttribute("formStatus", FormStatus.UPDATE);
+
+        return "articles/form";
+    }
+
+    @PostMapping("/{articleId}/form")
+    public String updateArticleForm(@PathVariable Long articleId, ArticleRequest articleRequest) {
+        articleService.updateArticle(articleId, articleRequest.toDto(UserAccountDto.of(
+            "uno", "asdf1234", "uno@mail.com", "Uno", "memo"
+        )));
+
+        return "redirect:/articles/" + articleId;
+    }
+
+    @PostMapping("/{articleId}/delete")
+    public String deleteArticle(@PathVariable Long articleId) {
+        articleService.deleteArticle(articleId);
+
+        return "redirect:/articles";
     }
 }
