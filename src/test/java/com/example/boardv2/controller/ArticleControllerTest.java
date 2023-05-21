@@ -6,6 +6,7 @@ import com.example.boardv2.dto.ArticleWithCommentsDto;
 import com.example.boardv2.dto.UserAccountDto;
 import com.example.boardv2.service.ArticleService;
 import com.example.boardv2.service.PaginationService;
+import com.example.boardv2.utils.FormDataEncoder;
 import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -31,7 +32,7 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
 @DisplayName("View 컨트롤러 - 게시글")
-@Import(SecurityConfig.class)
+@Import({SecurityConfig.class, FormDataEncoder.class})
 @WebMvcTest(ArticleController.class)
 class ArticleControllerTest {
     private final MockMvc mvc;
