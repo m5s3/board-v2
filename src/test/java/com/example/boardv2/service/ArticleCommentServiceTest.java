@@ -1,8 +1,10 @@
 package com.example.boardv2.service;
 
 import com.example.boardv2.domain.Article;
+import com.example.boardv2.domain.ArticleComment;
 import com.example.boardv2.domain.UserAccount;
 import com.example.boardv2.dto.ArticleCommentDto;
+import com.example.boardv2.dto.UserAccountDto;
 import com.example.boardv2.repository.ArticleCommentRepository;
 import com.example.boardv2.repository.ArticleRepository;
 import com.example.boardv2.repository.UserAccountRepository;
@@ -13,14 +15,15 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
 
 import static org.assertj.core.api.Assertions.*;
-import static org.mockito.BDDMockito.given;
-import static org.mockito.BDDMockito.then;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.BDDMockito.*;
 
-@DisplayName("비지니스 로직 - 게시글")
+@DisplayName("비지니스 로직 - 댓글")
 @ExtendWith(MockitoExtension.class)
 class ArticleCommentServiceTest {
     @InjectMocks private ArticleCommentService sut;
@@ -30,20 +33,90 @@ class ArticleCommentServiceTest {
 
     @Mock private UserAccountRepository userAccountRepository;
 
-    @DisplayName("게시글 ID로 조회하면, 해당하는 댓글 리스트를 반환한다.")
+    private ArticleCommentDto createArticleCommentDto(String content) {
+        return ArticleCommentDto.of(
+                1L,
+                1L,
+                createUserAccountDto(),
+                content,
+                LocalDateTime.now(),
+                "uno",
+                LocalDateTime.now(),
+                "uno"
+        );
+    }
+
+    @DisplayName("댓글 정보를 입력하면, 댓글을 저장한다.")
     @Test
-    void givenArticleId_whenSearchingArticleComments_thenReturnsArticleComments() {
+    void givenArticleCommentInfo_whenSavingArticleComment_thenSavesArticleComment() {
         // Given
-        Long articleId = 1L;
-        UserAccount userAccount = userAccountRepository.save(UserAccount.of("uno", "pw", null, null, null));
-        given(articleRepository.findById(articleId)).willReturn(Optional.of(
-                Article.of(userAccount, "title", "content", "#java")
-                ));
+        ArticleCommentDto dto = createArticleCommentDto("댓글");
+        given(articleRepository.getReferenceById(dto.articleId())).willReturn(createArticle());
+        given(userAccountRepository.getReferenceById(dto.userAccountDto().userId())).willReturn(createUserAccount());
+        given(articleCommentRepository.save(any(ArticleComment.class))).willReturn(null);
+        
         // When
-        List<ArticleCommentDto> articleComments = sut.searchArticleComments(articleId);
+        sut.saveArticleComment(dto);
 
         // Then
-        assertThat(articleComments).isNotNull();
-        then(articleRepository).should().findById(articleId);
+        then(articleRepository).should().getReferenceById(dto.articleId());
+        then(userAccountRepository).should().getReferenceById(dto.userAccountDto().userId());
+        then(articleCommentRepository).should().save(any(ArticleComment.class));
+    }
+
+    @DisplayName("댓글 ID를 입력하면, 댓글을 삭제한다")
+    @Test
+    void givenArticleCommentId_whenDeletingArticleComment_thenDeletesArticleComment() {
+        // Given
+        Long articleCommentId = 1L;
+        willDoNothing().given(articleCommentRepository).deleteById(articleCommentId);
+
+        // When
+        sut.deleteArticleComment(articleCommentId);
+
+        // Then
+        then(articleCommentRepository).should().deleteById(articleCommentId);
+    }
+
+    private UserAccountDto createUserAccountDto() {
+        return UserAccountDto.of(
+                "uno",
+                "password",
+                "uno@mail.com",
+                "Uno",
+                "This is memo",
+                LocalDateTime.now(),
+                "uno",
+                LocalDateTime.now(),
+                "uno"
+        );
+    }
+
+    private ArticleComment createArticleComment(String content) {
+        return ArticleComment.of(
+                Article.of(createUserAccount(), "title", "content", "hashtag"),
+                createUserAccount(),
+                content
+        );
+    }
+
+    private UserAccount createUserAccount() {
+        return UserAccount.of(
+                "uno",
+                "password",
+                "uno@email.com",
+                "Uno",
+                null
+        );
+    }
+
+
+    private Article createArticle() {
+        return Article.of(
+                createUserAccount(),
+                "title",
+                "content",
+                "#java"
+        );
     }
 }
