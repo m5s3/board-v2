@@ -1,4 +1,4 @@
-package com.example.boardv2.request;
+package com.example.boardv2.dto.request;
 
 import com.example.boardv2.dto.ArticleDto;
 import com.example.boardv2.dto.UserAccountDto;
