@@ -1,13 +1,13 @@
 -- 테스트 계정
 -- TODO: 테스트용이지만 비밀번호가 노출된 데이터 세팅. 개선하는 것이 좋을 지 고민해 보자.
 insert into user_account (user_id, user_password, nickname, email, memo, created_at, created_by, modified_at, modified_by) values
-('uno', 'asdf1234', 'Uno', 'uno@mail.com', 'I am Uno.', now(), 'uno', now(), 'uno')
+('uno', '{noop}asdf1234', 'Uno', 'uno@mail.com', 'I am Uno.', now(), 'uno', now(), 'uno')
 ;
 insert into user_account (user_id, user_password, nickname, email, memo, created_at, created_by, modified_at, modified_by) values
-('uno2', 'asdf1234', 'Uno2', 'uno2@mail.com', 'I am Uno2.', now(), 'uno2', now(), 'uno2')
+('uno2', '{noop}asdf1234', 'Uno2', 'uno2@mail.com', 'I am Uno2.', now(), 'uno2', now(), 'uno2')
 ;
 insert into user_account (user_id, user_password, nickname, email, memo, created_at, created_by, modified_at, modified_by) values
-('m5s3', 'asdf1234', 'm5s3', 'm5s3@mail.com', 'I am m5s3.', now(), 'm5s3', now(), 'm5s3')
+('m5s3', '{noop}test', 'm5s3', 'm5s3@mail.com', 'I am m5s3.', now(), 'm5s3', now(), 'm5s3')
 ;
 -- 123 게시글
 insert into article (user_id, title, content, hashtag, created_by, modified_by, created_at, modified_at) values
