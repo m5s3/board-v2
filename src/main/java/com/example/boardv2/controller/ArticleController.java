@@ -10,6 +10,7 @@ import com.example.boardv2.dto.security.BoardPrincipal;
 import com.example.boardv2.service.ArticleService;
 import com.example.boardv2.service.PaginationService;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
@@ -21,6 +22,7 @@ import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
+@Slf4j
 @RequiredArgsConstructor
 @RequestMapping("/articles")
 @Controller
@@ -47,10 +49,11 @@ public class ArticleController {
 
     @GetMapping("/{articleId}")
     public String article(@PathVariable Long articleId, ModelMap map) {
-        ArticleWithCommentsResponse articleWithCommentsResponse = ArticleWithCommentsResponse.from(articleService.getArticleWithComments(articleId));
-        map.addAttribute("article",  articleWithCommentsResponse);
-        map.addAttribute("articleComments", articleWithCommentsResponse.articleCommentsResponse());
-        //map.addAttribute("article", )
+        ArticleWithCommentsResponse article = ArticleWithCommentsResponse.from(articleService.getArticleWithComments(articleId));
+        map.addAttribute("totalCount", articleService.getArticleCount());
+        map.addAttribute("article", article);
+        map.addAttribute("articleComments", article.articleCommentsResponse());
+        map.addAttribute("searchTypeHashtag", SearchType.HASHTAG);
         return "articles/detail";
     }
 
