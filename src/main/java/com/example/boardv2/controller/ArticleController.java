@@ -3,22 +3,26 @@ package com.example.boardv2.controller;
 import com.example.boardv2.domain.constant.FormStatus;
 import com.example.boardv2.domain.constant.SearchType;
 import com.example.boardv2.dto.UserAccountDto;
-import com.example.boardv2.request.ArticleRequest;
-import com.example.boardv2.response.ArticleResponse;
-import com.example.boardv2.response.ArticleWithCommentsResponse;
+import com.example.boardv2.dto.request.ArticleRequest;
+import com.example.boardv2.dto.response.ArticleResponse;
+import com.example.boardv2.dto.response.ArticleWithCommentsResponse;
+import com.example.boardv2.dto.security.BoardPrincipal;
 import com.example.boardv2.service.ArticleService;
 import com.example.boardv2.service.PaginationService;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.data.web.PageableDefault;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.ModelMap;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
+@Slf4j
 @RequiredArgsConstructor
 @RequestMapping("/articles")
 @Controller
@@ -45,10 +49,11 @@ public class ArticleController {
 
     @GetMapping("/{articleId}")
     public String article(@PathVariable Long articleId, ModelMap map) {
-        ArticleWithCommentsResponse articleWithCommentsResponse = ArticleWithCommentsResponse.from(articleService.getArticleWithComments(articleId));
-        map.addAttribute("article",  articleWithCommentsResponse);
-        map.addAttribute("articleComments", articleWithCommentsResponse.articleCommentsResponse());
-        //map.addAttribute("article", )
+        ArticleWithCommentsResponse article = ArticleWithCommentsResponse.from(articleService.getArticleWithComments(articleId));
+        map.addAttribute("totalCount", articleService.getArticleCount());
+        map.addAttribute("article", article);
+        map.addAttribute("articleComments", article.articleCommentsResponse());
+        map.addAttribute("searchTypeHashtag", SearchType.HASHTAG);
         return "articles/detail";
     }
 
@@ -76,11 +81,11 @@ public class ArticleController {
     }
 
     @PostMapping("/form")
-    public String postNewArticle(ArticleRequest articleRequest) {
-        articleService.saveArticle(articleRequest.toDto(UserAccountDto.of(
-            "uno", "asdf1234", "uno@mail.com", "Uno", "memo"
-        )));
-
+    public String postNewArticle(
+            @AuthenticationPrincipal BoardPrincipal boardPrincipal,
+            ArticleRequest articleRequest
+    ) {
+        articleService.saveArticle(articleRequest.toDto(boardPrincipal.toDto()));
         return "redirect:/articles";
     }
 
@@ -95,18 +100,21 @@ public class ArticleController {
     }
 
     @PostMapping("/{articleId}/form")
-    public String updateArticleForm(@PathVariable Long articleId, ArticleRequest articleRequest) {
-        articleService.updateArticle(articleId, articleRequest.toDto(UserAccountDto.of(
-            "uno", "asdf1234", "uno@mail.com", "Uno", "memo"
-        )));
-
+    public String updateArticleForm(
+        @PathVariable Long articleId,
+        @AuthenticationPrincipal BoardPrincipal boardPrincipal,
+        ArticleRequest articleRequest
+    ) {
+        articleService.updateArticle(articleId, articleRequest.toDto(boardPrincipal.toDto()));
         return "redirect:/articles/" + articleId;
     }
 
     @PostMapping("/{articleId}/delete")
-    public String deleteArticle(@PathVariable Long articleId) {
-        articleService.deleteArticle(articleId);
-
+    public String deleteArticle(
+            @PathVariable Long articleId,
+            @AuthenticationPrincipal BoardPrincipal boardPrincipal
+            ) {
+        articleService.deleteArticle(articleId, boardPrincipal.getUsername());
         return "redirect:/articles";
     }
 }
