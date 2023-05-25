@@ -2,6 +2,7 @@ package com.example.boardv2.service;
 
 import com.example.boardv2.domain.Article;
 import com.example.boardv2.domain.ArticleComment;
+import com.example.boardv2.domain.Hashtag;
 import com.example.boardv2.domain.UserAccount;
 import com.example.boardv2.dto.ArticleCommentDto;
 import com.example.boardv2.dto.UserAccountDto;
@@ -95,7 +96,7 @@ class ArticleCommentServiceTest {
 
     private ArticleComment createArticleComment(String content) {
         return ArticleComment.of(
-                Article.of(createUserAccount(), "title", "content", "hashtag"),
+                Article.of(createUserAccount(), "title", "content"),
                 createUserAccount(),
                 content
         );
@@ -113,11 +114,18 @@ class ArticleCommentServiceTest {
 
 
     private Article createArticle() {
-        return Article.of(
+        Article article = Article.of(
                 createUserAccount(),
                 "title",
-                "content",
-                "#java"
+                "content"
         );
+
+        article.addHashtag(createHashtag(article));
+
+        return article;
+    }
+
+    private Hashtag createHashtag(Article article) {
+        return Hashtag.of("java");
     }
 }
