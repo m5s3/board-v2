@@ -44,16 +44,18 @@ public class ArticleController {
         map.addAttribute("articles", articles);
         map.addAttribute("paginationBarNumbers", barNumbers);
         map.addAttribute("searchTypes", SearchType.values());
+        map.addAttribute("searchTypeHashtag", SearchType.HASHTAG);
         return "articles/index";
     }
 
     @GetMapping("/{articleId}")
     public String article(@PathVariable Long articleId, ModelMap map) {
         ArticleWithCommentsResponse article = ArticleWithCommentsResponse.from(articleService.getArticleWithComments(articleId));
-        map.addAttribute("totalCount", articleService.getArticleCount());
         map.addAttribute("article", article);
         map.addAttribute("articleComments", article.articleCommentsResponse());
+        map.addAttribute("totalCount", articleService.getArticleCount());
         map.addAttribute("searchTypeHashtag", SearchType.HASHTAG);
+
         return "articles/detail";
     }
 
