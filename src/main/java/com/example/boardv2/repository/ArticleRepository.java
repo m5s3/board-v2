@@ -13,6 +13,7 @@ import org.springframework.data.querydsl.binding.QuerydslBinderCustomizer;
 import org.springframework.data.querydsl.binding.QuerydslBindings;
 import org.springframework.data.rest.core.annotation.RepositoryRestResource;
 
+import java.util.Collection;
 import java.util.List;
 import java.util.stream.DoubleStream;
 
@@ -43,5 +44,5 @@ public interface ArticleRepository extends
         bindings.bind(root.createdAt).first(DateTimeExpression::eq);
     };
 
-    //Page<Article> findByHashtagNames(List<String> toList, Pageable pageable);
+    Page<Article> findByHashtagNames(Collection<String> hashtagNames, Pageable pageable);
 }
